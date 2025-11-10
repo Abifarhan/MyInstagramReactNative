@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+
+# Expo
+.expo/
+web-build/
+
+# Build output
+dist/
+
+# Logs
+*.log
+*.tmp
+
+# macOS
+.DS_Store
+
+# Environment
+.env*
+
+# Demo change for commit/push
+# SSH key setup tested
+# Ignore SSH key files
+github_pat_*
+
+# IDE
+.idea/
+.vscode/
+
+# Others
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
