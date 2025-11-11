@@ -43,7 +43,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     try {
       // Create user account
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       // Update profile with display name
       await updateProfile(userCredential.user, {
         displayName: displayName,
@@ -72,12 +72,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
         <View style={styles.content}>
           <Text style={styles.title}>Instagram</Text>
-          
+
           <View style={styles.form}>
             <TextInput
               style={styles.input}
@@ -86,7 +86,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               onChangeText={setDisplayName}
               autoCapitalize="none"
             />
-            
+
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -95,7 +95,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            
+
             <TextInput
               style={styles.input}
               placeholder="Password"
@@ -103,7 +103,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               onChangeText={setPassword}
               secureTextEntry
             />
-            
+
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
               onPress={handleRegister}
@@ -113,7 +113,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>

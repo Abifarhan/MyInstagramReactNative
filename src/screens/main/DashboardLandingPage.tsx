@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FeedScreen from './FeedScreen';
+import ProfileScreen from './ProfileScreen';
 
 // Placeholder components for tabs that don't exist yet
 const SearchScreen = () => (
@@ -18,12 +19,7 @@ const AddPostScreen = () => (
   </View>
 );
 
-const ProfileScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff8f0' }}>
-    <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333' }}>👤 Profile Screen</Text>
-    <Text style={{ fontSize: 16, color: '#666', marginTop: 10 }}>View and edit your profile</Text>
-  </View>
-);
+
 
 const DashboardLandingPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Feed');
