@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
-import { auth, firestore } from '../../config/firebase';
-import { User as AppUser, Post } from '../../types';
+import { auth } from '../../config/firebase';
 import ProfileTemplate from '../../components/templates/ProfileTemplate';
+import { useUserProfileViewModel } from '../../viewmodels/useUserProfileViewModel';
 
 const ProfileScreen: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<AppUser | null>(null);
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { userProfile, userPosts, loading } = useUserProfileViewModel();
   const highlights = [
     { id: '1', label: 'Loc journey', image: 'https://via.placeholder.com/60' },
     { id: '2', label: 'wellness', image: 'https://via.placeholder.com/60' },
@@ -23,47 +20,6 @@ const ProfileScreen: React.FC = () => {
     { id: 'tagged', icon: '🏷️' },
   ];
   const [activeTab, setActiveTab] = useState('grid');
-
-  useEffect(() => {
-    if (auth.currentUser) {
-      loadUserProfile();
-      loadUserPosts();
-    }
-  }, []);
-
-  const loadUserProfile = async () => {
-    if (!auth.currentUser) return;
-    try {
-      const userDoc = await getDoc(doc(firestore, 'users', auth.currentUser.uid));
-      if (userDoc.exists()) {
-        setUserProfile(userDoc.data() as AppUser);
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadUserPosts = () => {
-    if (!auth.currentUser) return;
-    const postsQuery = query(
-      collection(firestore, 'posts'),
-      where('userId', '==', auth.currentUser.uid)
-    );
-    const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
-      const posts: Post[] = [];
-      snapshot.forEach((doc) => {
-        posts.push({ id: doc.id, ...doc.data() } as Post);
-      });
-      setUserPosts(posts.sort((a, b) => {
-        const aTime = typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : a.createdAt;
-        const bTime = typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : b.createdAt;
-        return bTime - aTime;
-      }));
-    });
-    return unsubscribe;
-  };
 
   const handleSignOut = () => {
     Alert.alert(
