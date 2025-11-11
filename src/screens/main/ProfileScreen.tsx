@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { auth, firestore } from '../../config/firebase';
 import { User as AppUser, Post } from '../../types';
+import ProfileTemplate from '../../components/templates/ProfileTemplate';
 
 const ProfileScreen: React.FC = () => {
   const [userProfile, setUserProfile] = useState<AppUser | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const highlights = [
+    { id: '1', label: 'Loc journey', image: 'https://via.placeholder.com/60' },
+    { id: '2', label: 'wellness', image: 'https://via.placeholder.com/60' },
+    { id: '3', label: 'Sonoma', image: 'https://via.placeholder.com/60' },
+    { id: '4', label: 'Skincare 2.0', image: 'https://via.placeholder.com/60' },
+  ];
+  const tabIcons = [
+    { id: 'grid', icon: '▦' },
+    { id: 'reels', icon: '🎬' },
+    { id: 'guides', icon: '📖' },
+    { id: 'tagged', icon: '🏷️' },
+  ];
+  const [activeTab, setActiveTab] = useState('grid');
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -28,7 +33,6 @@ const ProfileScreen: React.FC = () => {
 
   const loadUserProfile = async () => {
     if (!auth.currentUser) return;
-
     try {
       const userDoc = await getDoc(doc(firestore, 'users', auth.currentUser.uid));
       if (userDoc.exists()) {
@@ -43,12 +47,10 @@ const ProfileScreen: React.FC = () => {
 
   const loadUserPosts = () => {
     if (!auth.currentUser) return;
-
     const postsQuery = query(
       collection(firestore, 'posts'),
       where('userId', '==', auth.currentUser.uid)
     );
-
     const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
       const posts: Post[] = [];
       snapshot.forEach((doc) => {
@@ -60,7 +62,6 @@ const ProfileScreen: React.FC = () => {
         return bTime - aTime;
       }));
     });
-
     return unsubscribe;
   };
 
@@ -79,82 +80,41 @@ const ProfileScreen: React.FC = () => {
     );
   };
 
-  const renderPost = ({ item }: { item: Post }) => (
-    <TouchableOpacity style={styles.postItem}>
-      <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
-    </TouchableOpacity>
-  );
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
+  if (loading || !userProfile) {
+    return <ProfileTemplate
+      user={{
+        uid: '',
+        email: '',
+        displayName: 'Loading...',
+        photoURL: '',
+        bio: '',
+        followers: [],
+        following: [],
+      }}
+      posts={[]}
+      highlights={highlights}
+      activeTab={activeTab}
+      onTabPress={setActiveTab}
+      onFollow={() => {}}
+      onMessage={() => {}}
+      onEmail={() => {}}
+      onMore={handleSignOut}
+      tabIcons={tabIcons}
+    />;
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity onPress={handleSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.profileSection}>
-        <View style={styles.profileInfo}>
-          <Image
-            source={{
-              uri: auth.currentUser?.photoURL || 'https://via.placeholder.com/100',
-            }}
-            style={styles.profileImage}
-          />
-          <View style={styles.profileStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userPosts.length}</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userProfile?.followers.length || 0}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userProfile?.following.length || 0}</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.profileDetails}>
-          <Text style={styles.displayName}>
-            {auth.currentUser?.displayName || 'Anonymous'}
-          </Text>
-          <Text style={styles.email}>{auth.currentUser?.email}</Text>
-          {userProfile?.bio ? (
-            <Text style={styles.bio}>{userProfile.bio}</Text>
-          ) : null}
-        </View>
-      </View>
-
-      <View style={styles.postsSection}>
-        <Text style={styles.postsTitle}>Posts</Text>
-        <FlatList
-          data={userPosts}
-          renderItem={renderPost}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No posts yet</Text>
-              <Text style={styles.emptySubtext}>Share your first post!</Text>
-            </View>
-          }
-        />
-      </View>
-    </SafeAreaView>
-  );
+  return <ProfileTemplate
+    user={userProfile}
+    posts={userPosts}
+    highlights={highlights}
+    activeTab={activeTab}
+    onTabPress={setActiveTab}
+    onFollow={() => {}}
+    onMessage={() => {}}
+    onEmail={() => {}}
+    onMore={handleSignOut}
+    tabIcons={tabIcons}
+  />;
 };
 
 const styles = StyleSheet.create({
@@ -162,89 +122,159 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
+  topBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingTop: 16,
+    paddingBottom: 8,
   },
-  headerTitle: {
+  username: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#262626',
+    textAlign: 'center',
+    flex: 1,
   },
-  signOutText: {
-    fontSize: 16,
-    color: '#3897f0',
+  menuIcon: {
+    fontSize: 24,
+    color: '#262626',
+    paddingLeft: 16,
   },
-  profileSection: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  profileInfo: {
+  profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
-  profileImage: {
+  avatarContainer: {
+    marginRight: 16,
+  },
+  storyRing: {
+    borderWidth: 3,
+    borderColor: '#c800ff',
+    borderRadius: 50,
+    padding: 2,
+  },
+  avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginRight: 20,
   },
-  profileStats: {
-    flex: 1,
+  statsContainer: {
     flexDirection: 'row',
+    flex: 1,
     justifyContent: 'space-around',
   },
   statItem: {
     alignItems: 'center',
+    marginHorizontal: 8,
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#262626',
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#8e8e8e',
   },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginVertical: 8,
+  },
+  actionButton: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 18,
+    marginHorizontal: 2,
+  },
+  actionButtonText: {
+    fontSize: 15,
+    color: '#262626',
+    fontWeight: 'bold',
+  },
   profileDetails: {
-    marginLeft: 0,
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
   displayName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#262626',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: '#8e8e8e',
-    marginBottom: 8,
+    marginBottom: 2,
   },
   bio: {
     fontSize: 14,
     color: '#262626',
+    marginBottom: 2,
+    lineHeight: 18,
+  },
+  highlightsRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+  highlightItem: {
+    alignItems: 'center',
+    marginHorizontal: 8,
+  },
+  highlightCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#d2b48c',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  highlightImage: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+  },
+  highlightLabel: {
+    fontSize: 12,
+    color: '#262626',
+    textAlign: 'center',
+    maxWidth: 60,
+  },
+  tabBarRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingVertical: 6,
+    marginBottom: 2,
+  },
+  tabBarIcon: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  tabBarIconText: {
+    fontSize: 22,
+    color: '#888',
+  },
+  activeTabBarIcon: {
+    color: '#262626',
+    fontWeight: 'bold',
   },
   postsSection: {
     flex: 1,
-    padding: 16,
-  },
-  postsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#262626',
-    marginBottom: 12,
+    padding: 8,
   },
   postItem: {
     flex: 1,
     margin: 2,
     aspectRatio: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   postImage: {
     width: '100%',
