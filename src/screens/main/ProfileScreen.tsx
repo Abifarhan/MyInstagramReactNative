@@ -54,7 +54,11 @@ const ProfileScreen: React.FC = () => {
       snapshot.forEach((doc) => {
         posts.push({ id: doc.id, ...doc.data() } as Post);
       });
-      setUserPosts(posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()));
+      setUserPosts(posts.sort((a, b) => {
+        const aTime = typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : a.createdAt;
+        const bTime = typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : b.createdAt;
+        return bTime - aTime;
+      }));
     });
 
     return unsubscribe;

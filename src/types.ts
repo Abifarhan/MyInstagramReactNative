@@ -15,6 +15,17 @@ export type RootStackParamList = {
   DashboardLandingPage: undefined;
 };
 
+// User type
+export type User = {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  bio?: string;
+  followers: string[];
+  following: string[];
+};
+
 // Post type for FeedScreen
 export type Post = {
   id: string;
