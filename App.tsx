@@ -15,6 +15,7 @@ import FeedScreen from './src/screens/main/FeedScreen';
 import SearchScreen from './src/screens/main/SearchScreen';
 import AddPostScreen from './src/screens/main/AddPostScreen';
 import ProfileScreen from './src/screens/main/ProfileScreen';
+import DashboardLandingPage from './src/screens/main/DashboardLandingPage';
 import { RootStackParamList, MainTabParamList } from './src/types';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -22,44 +23,13 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // Main tab navigator for authenticated users
 function MainTabNavigator() {
+  // Dummy component for testing
+  const DummyScreen = () => (
+    <Text style={{ textAlign: 'center', marginTop: 50, fontSize: 20 }}>Dummy Tab Works!</Text>
+  );
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#eee',
-        },
-      }}>
-      <Tab.Screen 
-        name="Feed" 
-        component={FeedScreen}
-        options={{
-          tabBarLabel: 'Home',
-        }}
-      />
-      <Tab.Screen 
-        name="Search" 
-        component={SearchScreen}
-        options={{
-          tabBarLabel: 'Search',
-        }}
-      />
-      <Tab.Screen 
-        name="AddPost" 
-        component={AddPostScreen}
-        options={{
-          tabBarLabel: 'Add',
-        }}
-      />
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-        }}
-      />
+    <Tab.Navigator>
+      <Tab.Screen name="Feed" component={DummyScreen} />
     </Tab.Navigator>
   );
 }
@@ -90,7 +60,7 @@ function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {user ? (
-            <Stack.Screen name="Main" component={MainTabNavigator} />
+            <Stack.Screen name="DashboardLandingPage" component={DashboardLandingPage} />
           ) : (
             <>
               <Stack.Screen name="Login" component={LoginScreen} />
