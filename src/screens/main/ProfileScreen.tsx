@@ -19,8 +19,6 @@ const ProfileScreen: React.FC = () => {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  
-
   useEffect(() => {
     if (auth.currentUser) {
       loadUserProfile();

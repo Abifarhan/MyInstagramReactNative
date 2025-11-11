@@ -63,6 +63,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
       // Navigation will be handled automatically by the auth state listener
     } catch (error: any) {
+      console.log('Registration failed:', error);
       Alert.alert('Registration Error', error.message);
     } finally {
       setLoading(false);

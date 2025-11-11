@@ -1,5 +1,6 @@
 // Instagram Clone App
 import React, { useEffect, useState } from 'react';
+import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -77,8 +78,11 @@ function App() {
   }, []);
 
   if (loading) {
-    // You can add a loading screen component here
-    return null;
+    return (
+      <SafeAreaProvider>
+        <Text style={{ textAlign: 'center', marginTop: 50, fontSize: 20 }}>Loading...</Text>
+      </SafeAreaProvider>
+    );
   }
 
   return (
