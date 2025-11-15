@@ -13,6 +13,43 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { Post } from '../../types';
 
+const mockPosts: Post[] = [
+  {
+    id: '1',
+    user: { name: 'Andrey', avatar: '' },
+    timestamp: '14:00',
+    text: 'Text, Text, Text Text, Text, Text Text, Text, Text',
+    comments: ['Comment 1', 'Comment 2'],
+    likes: 5,
+  },
+  {
+    id: '2',
+    user: { name: 'Jin', avatar: '' },
+    timestamp: '10:00',
+    text: '',
+    image: 'https://via.placeholder.com/150',
+    comments: ['Comment 1'],
+    likes: 2,
+  },
+  {
+    id: '3',
+    user: { name: 'Max', avatar: '' },
+    timestamp: '04.05',
+    text: 'Text, Text, Text Text, Text, Text Text, Text, Text',
+    comments: ['Comment 1', 'Comment 2', 'Comment 3'],
+    likes: 3,
+  },
+  {
+    id: '4',
+    user: { name: 'Kate', avatar: '' },
+    timestamp: '03.05',
+    text: 'Text',
+    video: 'https://sample-videos.com/video123/mp4/240/big_buck_bunny_240p_1mb.mp4',
+    comments: [],
+    likes: 1,
+  },
+];
+
 const FeedScreen: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -90,7 +127,7 @@ const FeedScreen: React.FC = () => {
       </View>
       
       <FlatList
-        data={posts}
+        data={mockPosts}
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         refreshControl={
